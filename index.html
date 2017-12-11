@@ -1,0 +1,65 @@
+<html>
+
+<head>
+    <script src="https://aframe.io/releases/0.7.0/aframe.min.js"></script>
+</head>
+
+<body>
+    <a-scene>
+        <!-- Using the asset management system. -->
+        <a-assets>
+            <a-asset-item id="door" src="scene.gltf">
+            <img id="sky" src="images/room.jpg">
+        </a-assets>
+        <!-- Loading our model to the scene. -->
+        <a-gltf-model 
+        src="#door"
+        position="0 1 -4"
+        rotation="0 90 0"
+        scale="1 1 1"
+        door="state: closed">
+        </a-gltf-model>
+        <!-- Creating a panoramic view -->
+        <a-sky src="#sky"></a-sky>
+    </a-scene>
+    <script>
+        AFRAME.registerComponent('door', {
+            schema: {
+                state: {type: 'string'},
+            },
+            init: function () {
+                var that = this;
+                window.onclick =  function(){
+                    if(that.state === 'closed')
+                        that.open()
+                    else 
+                        that.close()
+                }
+            },
+            open: function() {
+                this.state = "open";
+            },
+            close: function() {
+                this.state = "closed";
+            },
+            tick: function (time, timeDelta) {
+                var current = this.el.getAttribute('rotation');
+                var angle = 46 - (current.y - 45) ;
+                if(this.state === "closed" && current.y >= 0) {
+                    current.y -= 0.1 * angle;
+                    this.el.setAttribute('rotation', current);
+                } 
+                else if(this.state === "open" && current.y <= 90) {
+                    current.y += 0.5;
+                    this.el.setAttribute('rotation', current);
+                }
+            }
+
+        });
+        window.onclick = function() {
+            document.querySelector('#door').emit('animate-door');
+        }
+    </script>
+</body>
+
+</html>
